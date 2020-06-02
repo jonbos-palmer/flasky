@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, redirect, session, url_for
 from flask.helpers import make_response
 from flask.templating import render_template
 from flask_bootstrap import Bootstrap
@@ -26,15 +26,17 @@ class NameForm(FlaskForm):
 
 # routes
 
-
+# POST, REDIRECT, GET
 @app.route('/', methods=['GET','POST'])
 def index():
     name=None
     form = NameForm()
     if form.validate_on_submit():
-        name=form.name.data
-        form.name.data=''
-    return render_template('index.html', current_time=datetime.utcnow(), name=name, form=form)
+        # on valid data, save name in session (client storage) and redirect to this page
+        session['name']=form.name.data
+        return redirect(url_for('index'))
+    # session.get() returns previously stored val or None (python default)
+    return render_template('index.html', current_time=datetime.utcnow(), name=session.get('name'), form=form)
 
 
 
