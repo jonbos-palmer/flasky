@@ -1,8 +1,10 @@
 from flask import Flask, request
 from flask.helpers import make_response
 from flask.templating import render_template
+from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
+bootstrap = Bootstrap(app)
 
 @app.route('/')
 def index():
