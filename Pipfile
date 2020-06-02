@@ -9,6 +9,7 @@ autopep8 = "*"
 [packages]
 flask = "*"
 flask-bootstrap4 = "*"
+flask-moment = "*"
 
 [requires]
 python_version = "3.8"

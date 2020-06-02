@@ -8,6 +8,9 @@
 <div class="container">
     <div class="page-header">
         <h1>Hello!</h1>
+        <p>The current time is: {{moment(current_time).format('LLLL')}}</p>
+        <p>That was {{moment(current_time).fromNow(refresh=True)}}</p>
+
     </div>
 </div>
 {% endblock %}
