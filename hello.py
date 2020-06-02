@@ -1,11 +1,18 @@
 from flask import Flask, request
 from flask.helpers import make_response
+from flask.templating import render_template
 
 app = Flask(__name__)
 
-@app.route('/dynamic/<name>')
-def index(name):
-    return f'<h1>Hello {name}!</h1>'
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', name=name)
 
 @app.route('/browser')
 def get_browser():
