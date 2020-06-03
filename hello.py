@@ -116,3 +116,10 @@ def get_res_obj():
     response = make_response('this is a response obj')
     response.set_cookie('beach_boy', 'Dennis')
     return response
+
+
+
+# Shell Context
+@app.shell_context_processor
+def makes_shell_context():
+    return dict(db=db, User=User, Role=Role)
