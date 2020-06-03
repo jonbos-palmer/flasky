@@ -70,13 +70,14 @@ def index():
             user = User(username=form.name.data)
             db.session.add(user)
             db.session.commit()
-            session['known']=False
+            session['known'] = False
         else:
-            session['known']=True
-        session['name']=form.name.data
-        form.name.data=''
+            session['known'] = True
+        session['name'] = form.name.data
+        form.name.data = ''
         return redirect(url_for('index'))
-    return render_template('index.html',form=form, name=session.get('name'), known=session.get('known', False))
+    return render_template('index.html', form=form, name=session.get('name'), known=session.get('known', False))
+
 
 @app.route('/user/<name>')
 def user(name):
@@ -116,7 +117,6 @@ def get_res_obj():
     response = make_response('this is a response obj')
     response.set_cookie('beach_boy', 'Dennis')
     return response
-
 
 
 # Shell Context
