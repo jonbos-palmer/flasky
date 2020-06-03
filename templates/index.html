@@ -2,11 +2,14 @@
 <div class="container">
     <div class="page-header">
         <h1>Hello, {% if name %} {{name}} {% else %} Stranger! {% endif %}
+        
+        {% if not known %}
+            <p>Nice to meet you!</p>
+            {% else %}            <p>Good to see you again!</p>
+
+        {% endif %}
         </h1>
     </div>
     {{wtf.quick_form(form)}}
-    <p>The current time is: {{moment(current_time).format('LLLL')}}</p>
-    <p>That was {{moment(current_time).fromNow(refresh=True)}}</p>
-
 </div>
 {% endblock %}
