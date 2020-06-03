@@ -7,6 +7,9 @@ from flask_moment import Moment
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+from flask_sqlalchemy import SQLAlchemy
+import os
+
 
 # app
 app = Flask(__name__)
@@ -16,32 +19,64 @@ app.config['SECRET_KEY'] = 'b quiet'
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
+# db
+basedir = os.path.abspath(os.path.dirname(__file__))
+db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] =\
+    'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+
+# models
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, index=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    def __repr__(self):
+        return '<Username %r>' % self.username
+
 # forms
 
 
 class NameForm(FlaskForm):
     name = StringField('What is your name?',
-    validators = [DataRequired()])
+                       validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 # routes
 
 # POST, REDIRECT, GET
-@app.route('/', methods=['GET','POST'])
+
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    name=None
+    name = None
     form = NameForm()
     if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('Looks like you changed your name!')
-        # on valid data, save name in session (client storage) and redirect to this page
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data)
+            db.session.add(user)
+            db.session.commit()
+            session['known']=False
+        else:
+            session['known']=True
         session['name']=form.name.data
+        form.name.data=''
         return redirect(url_for('index'))
-    # session.get() returns previously stored val or None (python default)
-    return render_template('index.html', current_time=datetime.utcnow(), name=session.get('name'), form=form)
-
-
+    return render_template('index.html',form=form, name=session.get('name'), known=session.get('known', False))
 
 @app.route('/user/<name>')
 def user(name):
