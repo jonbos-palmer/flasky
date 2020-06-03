@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, session, url_for
+from flask import Flask, request, redirect, session, url_for, flash
 from flask.helpers import make_response
 from flask.templating import render_template
 from flask_bootstrap import Bootstrap
@@ -32,6 +32,9 @@ def index():
     name=None
     form = NameForm()
     if form.validate_on_submit():
+        old_name = session.get('name')
+        if old_name is not None and old_name != form.name.data:
+            flash('Looks like you changed your name!')
         # on valid data, save name in session (client storage) and redirect to this page
         session['name']=form.name.data
         return redirect(url_for('index'))
