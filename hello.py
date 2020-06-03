@@ -10,11 +10,14 @@ from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
-
-
+from flask_mail import Mail, Message
+from threading import Thread
 # app
 app = Flask(__name__)
+
+app.config['FLASKY_ADMIN'] = os.environ.get('FLASKY_ADMIN')
 app.config['SECRET_KEY'] = 'b quiet'
+
 
 # extensions
 bootstrap = Bootstrap(app)
@@ -27,6 +30,30 @@ app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 migrate = Migrate(app, db)
 
+
+#mail
+
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', '587'))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() in \
+    ['true', 'on', '1']
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[FLASKY]'
+app.config['FLASKY_MAIL_SENDER'] = 'Flasky Admin <flasky@example.com>'
+mail = Mail(app)
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+def send_email(to, subject, template, **kwargs):
+    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + subject, sender = app.config['FLASKY_MAIL_SENDER'], recipients=[to])
+    msg.body = render_template(template+'.txt', **kwargs)
+    msg.html = render_template(template+'.html', **kwargs)
+    thr = Thread(target-send_async_email, args=[app, msg])
+    thr.start()
+    return thr
 # models
 
 
@@ -73,8 +100,11 @@ def index():
             db.session.add(user)
             db.session.commit()
             session['known'] = False
+            if app.config['FLASKY_ADMIN']:
+                send_email(app.config['FLASKY_ADMIN'], 'New User', 'mail/new_user', user=user)
         else:
             session['known'] = True
+
         session['name'] = form.name.data
         form.name.data = ''
         return redirect(url_for('index'))
