@@ -67,11 +67,6 @@ class User(db.Model):
 # forms
 
 
-class NameForm(FlaskForm):
-    name = StringField('What is your name?',
-                       validators=[DataRequired()])
-    submit = SubmitField('Submit')
-
 # routes
 
 # POST, REDIRECT, GET
