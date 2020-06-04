@@ -2,3 +2,4 @@
 *.pyc
 data.sqlite
 .idea/
+data-dev.sqlite
