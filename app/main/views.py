@@ -4,7 +4,7 @@ from flask import render_template, session, redirect, url_for, current_app
 
 from . import main
 from .forms import NameForm
-from ..email import send_mail
+from ..email import send_email
 from .. import db
 from ..models import User
 
