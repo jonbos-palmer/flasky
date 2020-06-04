@@ -15,8 +15,6 @@ from threading import Thread
 # app
 app = Flask(__name__)
 
-app.config['FLASKY_ADMIN'] = os.environ.get('FLASKY_ADMIN')
-app.config['SECRET_KEY'] = 'b quiet'
 
 
 # extensions
@@ -26,21 +24,11 @@ moment = Moment(app)
 # db
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy(app)
-app.config['SQLALCHEMY_DATABASE_URI'] =\
-    'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 migrate = Migrate(app, db)
 
 
 #mail
 
-app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
-app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', '587'))
-app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() in \
-    ['true', 'on', '1']
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[FLASKY]'
-app.config['FLASKY_MAIL_SENDER'] = 'Flasky Admin <flasky@example.com>'
 mail = Mail(app)
 
 def send_async_email(app, msg):
