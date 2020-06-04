@@ -17,3 +17,8 @@ class UserModelTestCase(unittest.TestCase):
         u = User(password='cat')
         self.assertTrue(u.verify_password('cat'))
         self.assertFalse(u.verify_password('dog'))
+
+    def test_password_salts_are_random(self):
+        u1 = User(password='cat')
+        u2 = User(password='cat')
+        self.assertNotEqual(u1.password_hash, u2.password_hash)
